@@ -952,6 +952,76 @@
     </div>
 </div>
 
+    <!-- ================= КАЛЬКУЛЯТОР 5: H6TeO6 + N2H4*2HCl ================= -->
+    <div class="accordion accordion--purple" id="acc5">
+        <div class="accordion-header" data-target="body5">
+            <h2>
+                <span>🧪 H₆TeO₆ + N₂H₄·2HCl</span>
+                <span class="reaction-mini">H₆TeO₆ + N₂H₄·2HCl → Te + N₂ + ...</span>
+            </h2>
+            <span class="accordion-icon">▾</span>
+        </div>
+        <div class="accordion-body" id="body5">
+            <div class="card">
+                <h1>⚗️ H₆TeO₆ + N₂H₄·2HCl</h1>
+                <div class="reaction-badge">
+                    H₆TeO₆ + N₂H₄·2HCl <span class="arrow">=</span> Te + N₂ + 2 HCl + 5 H₂O
+                </div>
+                <div class="subhead">
+                    <strong>Восстановление ортотеллуровой кислоты</strong> дигидрохлоридом гидразина
+                </div>
+                <div class="product-badges">
+                    <span class="badge reagent">🟡 H₆TeO₆</span>
+                    <span class="badge reagent">💧 N₂H₄·2HCl</span>
+                    <span class="badge product">🔘 Te — осадок</span>
+                    <span class="badge water">💨 N₂ + H₂O</span>
+                </div>
+
+                <div class="field-group" style="margin-top:20px;">
+                    <label>Навеска H₆TeO₆ <span class="unit">(г)</span></label>
+                    <input type="number" id="massH6TeO6_5" step="any" min="0" value="11.48" placeholder="например, 11.48">
+                    <div class="input-hint"><span>молярная масса H₆TeO₆ = 229.64 г/моль</span></div>
+                </div>
+
+                <div class="field-group">
+                    <label>Запас N₂H₄·2HCl <span class="unit">(%)</span></label>
+                    <input type="number" id="excess5" step="any" min="0" value="10.0" placeholder="например, 10">
+                    <div class="input-hint"><span>дополнительный избыток восстановителя</span></div>
+                </div>
+
+                <button class="btn" id="calc5">Рассчитать N₂H₄·2HCl</button>
+                <div class="error-msg" id="error5"></div>
+
+                <div class="result-box" id="result5">
+                    <div class="result-title">📋 Результаты расчета</div>
+                    <div class="result-row">
+                        <span class="result-label">Чистый N₂H₄·2HCl (100%)</span>
+                        <span class="result-value" id="pure5">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">N₂H₄·2HCl с учетом запаса</span>
+                        <span class="result-value" id="excess5out">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row" style="border-top:2px solid #c4b5fd; margin-top:8px; padding-top:14px;">
+                        <span class="result-label" style="font-weight:600; color:#6d28d9;">🔘 Теоретический выход Te</span>
+                        <span class="result-value" id="prod5" style="color:#6d28d9; font-size:1.5rem;">0.00 <small>г</small></span>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>ℹ️ Справочные данные:</strong><br>
+                    • Молярная масса <strong>H₆TeO₆ = 229.64 г/моль</strong><br>
+                    • Молярная масса <strong>N₂H₄·2HCl = 104.97 г/моль</strong><br>
+                    • Молярная масса <strong>Te = 127.60 г/моль</strong><br>
+                    <strong>Стехиометрия:</strong> 1 моль H₆TeO₆ : 1 моль N₂H₄·2HCl → 1 моль Te.<br>
+                    Запас добавляется к теоретически необходимому количеству восстановителя.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+
 <script>
     // ---------- 1. Аккордеон ----------
     document.querySelectorAll('.accordion-header').forEach(header => {
@@ -1237,6 +1307,65 @@
             waterMin95Out.innerHTML = `${fmt(waterMin95, 1)} <small>г (мл)</small>`;
             waterExcess95Out.innerHTML = `${fmt(waterExcess95, 1)} <small>г (мл)</small>`;
             satSol95Out.innerHTML = `${fmt(satSol95, 1)} <small>г</small>`;
+            resultBox.classList.add('highlight');
+        }
+
+        btn.addEventListener('click', calc);
+        [massInput, excessInput].forEach(inp => inp.addEventListener('keypress', e => {
+            if (e.key === 'Enter') { e.preventDefault(); calc(); }
+        }));
+        window.addEventListener('load', calc);
+    })();
+
+    // ---------- 7. Калькулятор 5: H6TeO6 + N2H4*2HCl ----------
+    (function() {
+        const M_H6TeO6 = 229.64;
+        const M_N2H4Cl2 = 104.97;
+        const M_Te = 127.60;
+        const STOICH = 1;
+
+        const massInput = document.getElementById('massH6TeO6_5');
+        const excessInput = document.getElementById('excess5');
+        const btn = document.getElementById('calc5');
+        const err = document.getElementById('error5');
+
+        const pureOut = document.getElementById('pure5');
+        const excessOut = document.getElementById('excess5out');
+        const prodOut = document.getElementById('prod5');
+        const resultBox = document.getElementById('result5');
+
+        function clear() {
+            pureOut.innerHTML = `— <small>г</small>`;
+            excessOut.innerHTML = `— <small>г</small>`;
+            prodOut.innerHTML = `— <small>г</small>`;
+            resultBox.classList.remove('highlight');
+        }
+
+        function calc() {
+            err.textContent = '';
+            const mH6TeO6 = parseFloat(massInput.value);
+            const ex = parseFloat(excessInput.value);
+
+            if (isNaN(mH6TeO6) || mH6TeO6 <= 0) {
+                err.textContent = 'Введите положительную навеску H₆TeO₆.';
+                clear();
+                return;
+            }
+            if (isNaN(ex) || ex < 0) {
+                err.textContent = 'Запас не может быть отрицательным.';
+                clear();
+                return;
+            }
+
+            const molH6TeO6 = mH6TeO6 / M_H6TeO6;
+            const molN2H4Cl2 = molH6TeO6 * STOICH;
+            const pureMass = molN2H4Cl2 * M_N2H4Cl2;
+            const excessMass = pureMass * (1 + ex / 100);
+            const prodMass = molH6TeO6 * M_Te;
+
+            pureOut.innerHTML = `${fmt(pureMass)} <small>г</small>`;
+            excessOut.innerHTML = `${fmt(excessMass)} <small>г</small>`;
+            prodOut.innerHTML = `${fmt(prodMass)} <small>г</small>`;
             resultBox.classList.add('highlight');
         }
 
