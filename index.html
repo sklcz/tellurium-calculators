@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькуляторы по химии теллура</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #eef2f5;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+        }
+        .page {
+            max-width: 800px;
+            width: 100%;
+        }
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a2e3b;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.02em;
+            text-align: center;
+        }
+        .page-subtitle {
+            text-align: center;
+            color: #5b6f7e;
+            font-size: 0.95rem;
+            margin-bottom: 28px;
+            font-weight: 400;
+        }
+
+        /* ----- Общий стиль аккордеона ----- */
+        .accordion {
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 8px 24px -8px rgba(0, 30, 20, 0.12);
+            border: 1px solid rgba(180, 210, 200, 0.5);
+            margin-bottom: 18px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .accordion:hover {
+            box-shadow: 0 12px 28px -8px rgba(0, 30, 20, 0.18);
+        }
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 24px;
+            cursor: pointer;
+            user-select: none;
+            background: #f9fdfb;
+            transition: background 0.15s;
+            gap: 12px;
+        }
+        .accordion-header:hover {
+            background: #f0faf6;
+        }
+        .accordion-header.active {
+            background: #e8f7f2;
+            border-bottom: 1px solid #c8e6dc;
+        }
+        .accordion-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            color: #0b2e26;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .accordion-header h2 .reaction-mini {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: #ffffffc0;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid #b8e6d8;
+            color: #106a52;
+            letter-spacing: -0.2px;
+        }
+        .accordion-icon {
+            font-size: 1.4rem;
+            font-weight: 300;
+            color: #106a52;
+            transition: transform 0.25s ease;
+            flex-shrink: 0;
+            width: 28px;
+            text-align: center;
+        }
+        .accordion-header.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.2s;
+            padding: 0 22px;
+        }
+        .accordion-body.open {
+            max-height: 3000px;
+            padding: 22px 22px 28px;
+        }
+
+        /* ----- Общие стили для карточек (внутри) ----- */
+        .card {
+            background: #ffffff;
+            width: 100%;
+            border-radius: 24px;
+            padding: 0;
+            border: none;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.02em;
+            color: #0b2e26;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .reaction-badge {
+            background: #e6f7f1;
+            border-radius: 40px;
+            padding: 10px 18px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #106a52;
+            display: inline-block;
+            margin-bottom: 16px;
+            border: 1px solid #b8e6d8;
+            font-family: 'Courier New', monospace;
+            letter-spacing: -0.3px;
+            line-height: 1.5;
+        }
+        .reaction-badge .arrow {
+            color: #0a7a3a;
+            font-weight: 700;
+            padding: 0 4px;
+        }
+        .subhead {
+            color: #4b6d63;
+            font-size: 0.9rem;
+            margin: -4px 0 16px 0;
+            line-height: 1.4;
+        }
+        .subhead strong {
+            color: #106a52;
+        }
+        .field-group {
+            margin-bottom: 18px;
+        }
+        label {
+            font-weight: 550;
+            font-size: 0.9rem;
+            color: #1e3d35;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+        label .unit {
+            font-weight: 400;
+            color: #6b8b80;
+            font-size: 0.85rem;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 1.05rem;
+            border: 1.5px solid #cfe3db;
+            border-radius: 18px;
+            background: #fbfefd;
+            transition: 0.15s;
+            font-weight: 500;
+            color: #0a2620;
+            outline: none;
+        }
+        input[type="number"]:focus {
+            border-color: #17a07a;
+            box-shadow: 0 0 0 4px rgba(23, 160, 122, 0.15);
+            background: #ffffff;
+        }
+        .input-hint {
+            font-size: 0.78rem;
+            color: #6b8b80;
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .row-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 480px) {
+            .row-2col {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+        .btn {
+            background: #106a52;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 14px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-top: 8px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 6px 14px rgba(16, 106, 82, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: #148a6a;
+            box-shadow: 0 10px 20px -6px rgba(16, 106, 82, 0.35);
+        }
+        .btn:active {
+            background: #0c5340;
+            transform: scale(0.99);
+        }
+        .result-box {
+            background: #eefaf6;
+            border-radius: 22px;
+            padding: 20px 18px 16px;
+            margin-top: 22px;
+            border: 1px solid #b8e6d8;
+            transition: 0.2s;
+        }
+        .result-box.highlight {
+            background: #e2f7ef;
+            border-color: #7fd4b8;
+        }
+        .result-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #0b4a3a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 7px 0;
+            border-bottom: 1px dashed #a8dcc8;
+        }
+        .result-row:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-weight: 500;
+            color: #1a5a48;
+            font-size: 0.9rem;
+        }
+        .result-value {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #043d2e;
+            letter-spacing: -0.01em;
+            font-variant-numeric: tabular-nums;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+        .result-value small {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: #4a7a6a;
+            letter-spacing: normal;
+        }
+        .note {
+            font-size: 0.78rem;
+            color: #4b6d63;
+            background: #ffffffc0;
+            padding: 12px 14px;
+            border-radius: 18px;
+            margin-top: 16px;
+            line-height: 1.5;
+            border: 1px solid #cfe3db;
+        }
+        .note strong {
+            color: #106a52;
+        }
+        .error-msg {
+            color: #b22222;
+            font-size: 0.9rem;
+            margin-top: 6px;
+            font-weight: 500;
+            min-height: 1.3em;
+        }
+        .product-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f0f4fa;
+            border: 1px solid #d0ddea;
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #2b4b6e;
+        }
+        .badge.reagent {
+            background: #e6f7f1;
+            border-color: #b8e6d8;
+            color: #106a52;
+        }
+        .badge.product {
+            background: #fffbe6;
+            border-color: #f0dca0;
+            color: #8a6a00;
+        }
+        .badge.water {
+            background: #eef5fe;
+            border-color: #b8cfe8;
+            color: #1e4a7a;
+        }
+
+        /* Специфичные для второго калькулятора (синяя гамма) */
+        .accordion--blue .accordion-header h2 .reaction-mini {
+            border-color: #b8d4e8;
+            color: #1a5a7a;
+        }
+        .accordion--blue .accordion-header.active {
+            background: #e8f2f8;
+            border-bottom-color: #b8d4e8;
+        }
+        .accordion--blue .accordion-icon {
+            color: #1a5a7a;
+        }
+        .accordion--blue .reaction-badge {
+            background: #e8f2f8;
+            border-color: #b8d4e8;
+            color: #1a5a7a;
+        }
+        .accordion--blue .btn {
+            background: #1a5a7a;
+            box-shadow: 0 6px 14px rgba(26, 90, 122, 0.25);
+        }
+        .accordion--blue .btn:hover {
+            background: #23709a;
+        }
+        .accordion--blue .result-box {
+            background: #f0f7fc;
+            border-color: #c8dce8;
+        }
+        .accordion--blue .result-box.highlight {
+            background: #e8f2f8;
+            border-color: #a0c8e0;
+        }
+        .accordion--blue .result-title {
+            color: #0b3a55;
+        }
+        .accordion--blue .result-label {
+            color: #1a4a65;
+        }
+        .accordion--blue .result-value {
+            color: #04283a;
+        }
+        .accordion--blue .result-value small {
+            color: #4a7a95;
+        }
+        .accordion--blue .note strong {
+            color: #1a5a7a;
+        }
+        .accordion--blue .badge.reagent {
+            background: #e8f2f8;
+            border-color: #b8d4e8;
+            color: #1a5a7a;
+        }
+        .accordion--blue .badge.product {
+            background: #fef9e7;
+            border-color: #f0e0a0;
+            color: #8a6d00;
+        }
+        .accordion--blue .badge.water {
+            background: #e6f7f2;
+            border-color: #b8e6d8;
+            color: #0f6a53;
+        }
+
+        /* Специфичные для третьего калькулятора (индиго) */
+        .accordion--indigo .accordion-header h2 .reaction-mini {
+            border-color: #c7d2fe;
+            color: #3730a3;
+        }
+        .accordion--indigo .accordion-header.active {
+            background: #eeefff;
+            border-bottom-color: #c7d2fe;
+        }
+        .accordion--indigo .accordion-icon {
+            color: #4338ca;
+        }
+        .accordion--indigo .reaction-badge {
+            background: #eeefff;
+            border-color: #c7d2fe;
+            color: #3730a3;
+        }
+        .accordion--indigo .btn {
+            background: #4338ca;
+            box-shadow: 0 6px 14px rgba(67, 56, 202, 0.25);
+        }
+        .accordion--indigo .btn:hover {
+            background: #4f46e5;
+        }
+        .accordion--indigo .result-box {
+            background: #f8f9ff;
+            border-color: #dbe0fa;
+        }
+        .accordion--indigo .result-box.highlight {
+            background: #eff1ff;
+            border-color: #b6c0f5;
+        }
+        .accordion--indigo .result-title {
+            color: #3730a3;
+        }
+        .accordion--indigo .result-label {
+            color: #2e2a5e;
+        }
+        .accordion--indigo .result-value {
+            color: #111033;
+        }
+        .accordion--indigo .result-value small {
+            color: #7b7a95;
+        }
+        .accordion--indigo .note strong {
+            color: #3730a3;
+        }
+        .accordion--indigo .badge.reagent {
+            background: #eeefff;
+            border-color: #c7d2fe;
+            color: #3730a3;
+        }
+        .accordion--indigo .badge.product {
+            background: #fdf4ff;
+            border-color: #f0abfc;
+            color: #86198f;
+        }
+
+        /* Специфичные для четвёртого калькулятора (вода, зелёная гамма) */
+        .accordion--water .accordion-header h2 .reaction-mini {
+            border-color: #b8e6d8;
+            color: #0f6a53;
+        }
+        .accordion--water .accordion-header.active {
+            background: #e6f7f1;
+            border-bottom-color: #b8e6d8;
+        }
+        .accordion--water .accordion-icon {
+            color: #0f6a53;
+        }
+        .accordion--water .reaction-badge {
+            background: #e6f7f1;
+            border-color: #b8e6d8;
+            color: #0f6a53;
+        }
+        .accordion--water .btn {
+            background: #0f6a53;
+            box-shadow: 0 6px 14px rgba(15, 106, 83, 0.25);
+        }
+        .accordion--water .btn:hover {
+            background: #148a6a;
+        }
+        .accordion--water .result-box {
+            background: #f0faf6;
+            border-color: #b8e6d8;
+        }
+        .accordion--water .result-box.highlight {
+            background: #e2f7ef;
+            border-color: #7fd4b8;
+        }
+        .accordion--water .result-title {
+            color: #0b4a3a;
+        }
+        .accordion--water .result-label {
+            color: #1a5a48;
+        }
+        .accordion--water .result-value {
+            color: #043d2e;
+        }
+        .accordion--water .result-value small {
+            color: #4a7a6a;
+        }
+        .accordion--water .note strong {
+            color: #0f6a53;
+        }
+
+        /* Водный блок для второго калькулятора */
+        .section-divider {
+            border: none;
+            border-top: 2px dashed #c8dce8;
+            margin: 22px 0 16px 0;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1a5a7a;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Температурный блок */
+        .temp-block {
+            background: #ffffff;
+            border: 1px solid #cfe3db;
+            border-radius: 18px;
+            padding: 14px 16px;
+            margin-top: 12px;
+        }
+        .temp-block + .temp-block {
+            margin-top: 10px;
+        }
+        .temp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .temp-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #0b4a3a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .temp-solubility {
+            font-size: 0.78rem;
+            color: #4a7a6a;
+            background: #eefaf6;
+            padding: 2px 10px;
+            border-radius: 14px;
+            border: 1px solid #b8e6d8;
+        }
+        .temp-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 5px 0;
+            border-bottom: 1px dashed #d4ede4;
+        }
+        .temp-row:last-child {
+            border-bottom: none;
+        }
+        .temp-label {
+            font-size: 0.85rem;
+            color: #1a5a48;
+            font-weight: 500;
+        }
+        .temp-value {
+            font-weight: 700;
+            font-size: 1.15rem;
+            color: #043d2e;
+            font-variant-numeric: tabular-nums;
+        }
+        .temp-value small {
+            font-size: 0.72rem;
+            font-weight: 400;
+            color: #4a7a6a;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="page-title">⚗️ Калькуляторы по химии теллура</div>
+    <div class="page-subtitle">Четыре реакции — один интерфейс. Нажмите на заголовок, чтобы развернуть.</div>
+
+    <!-- ================= КАЛЬКУЛЯТОР 1: Te + H2O2 ================= -->
+    <div class="accordion" id="acc1">
+        <div class="accordion-header" data-target="body1">
+            <h2>
+                <span>🧪 Te + H₂O₂</span>
+                <span class="reaction-mini">Te + 3 H₂O₂ → H₆TeO₆</span>
+            </h2>
+            <span class="accordion-icon">▾</span>
+        </div>
+        <div class="accordion-body" id="body1">
+            <div class="card">
+                <h1>⚗️ Te + H₂O₂</h1>
+                <div class="reaction-badge">
+                    Te + 3 H₂O₂ <span class="arrow">=</span> H₆TeO₆
+                </div>
+                <div class="subhead">
+                    <strong>Окисление теллура</strong> до ортотеллуровой кислоты
+                </div>
+                <div class="product-badges">
+                    <span class="badge reagent">🧪 Te — порошок</span>
+                    <span class="badge reagent">💧 H₂O₂ 35%</span>
+                    <span class="badge product">🟡 H₆TeO₆</span>
+                </div>
+
+                <div class="field-group" style="margin-top:20px;">
+                    <label>Навеска Te <span class="unit">(г)</span></label>
+                    <input type="number" id="massTe1" step="any" min="0" value="5.0" placeholder="например, 5.0">
+                    <div class="input-hint"><span>молярная масса Te = 127.60 г/моль</span></div>
+                </div>
+
+                <div class="field-group">
+                    <label>Запас H₂O₂ <span class="unit">(%)</span></label>
+                    <input type="number" id="excess1" step="any" min="0" value="20.0" placeholder="например, 20">
+                    <div class="input-hint"><span>дополнительный избыток перекиси</span></div>
+                </div>
+
+                <div class="row-2col">
+                    <div class="field-group">
+                        <label>Концентрация H₂O₂ <span class="unit">(% масс.)</span></label>
+                        <input type="number" id="conc1" step="any" min="1" max="100" value="35.0" placeholder="35">
+                        <div class="input-hint"><span>обычно 35%</span></div>
+                    </div>
+                    <div class="field-group">
+                        <label>Плотность <span class="unit">(г/мл)</span></label>
+                        <input type="number" id="density1" step="any" min="1.0" max="1.3" value="1.13" placeholder="1.13">
+                        <div class="input-hint"><span>ρ ≈ 1.13 для 35%</span></div>
+                    </div>
+                </div>
+
+                <button class="btn" id="calc1">Рассчитать H₂O₂</button>
+                <div class="error-msg" id="error1"></div>
+
+                <div class="result-box" id="result1">
+                    <div class="result-title">📋 Результаты расчета</div>
+                    <div class="result-row">
+                        <span class="result-label">Чистая H₂O₂ (100%)</span>
+                        <span class="result-value" id="pure1">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">H₂O₂ с учетом запаса</span>
+                        <span class="result-value" id="excess1out">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Масса раствора H₂O₂</span>
+                        <span class="result-value" id="solMass1">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Объем раствора H₂O₂</span>
+                        <span class="result-value" id="solVol1">0.00 <small>мл</small></span>
+                    </div>
+                    <div class="result-row" style="border-top:2px solid #7fd4b8; margin-top:6px; padding-top:12px;">
+                        <span class="result-label">Теоретический выход H₆TeO₆</span>
+                        <span class="result-value" id="prod1">0.00 <small>г</small></span>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>ℹ️ Примечание:</strong> Реакция окисления теллура перекисью водорода. 
+                    Стехиометрия: <strong>1 моль Te требует 3 моль H₂O₂</strong>. 
+                    Расчёт ведётся по объёму 35% раствора H₂O₂ (ρ = 1.13 г/мл). 
+                    Запас добавляется к теоретически необходимому количеству чистой H₂O₂.
+                    Выход H₆TeO₆ рассчитан теоретически (100%).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= КАЛЬКУЛЯТОР 2: TeO2 + N2H4*2HCl ================= -->
+    <div class="accordion accordion--blue" id="acc2">
+        <div class="accordion-header" data-target="body2">
+            <h2>
+                <span>🧪 TeO₂ + N₂H₄·2HCl</span>
+                <span class="reaction-mini">TeO₂ + N₂H₄·2HCl → Te + N₂ + ...</span>
+            </h2>
+            <span class="accordion-icon">▾</span>
+        </div>
+        <div class="accordion-body" id="body2">
+            <div class="card">
+                <h1>⚗️ TeO₂ + N₂H₄·2HCl</h1>
+                <div class="reaction-badge">
+                    TeO₂ + N₂H₄·2HCl <span class="arrow">=</span> Te + N₂ + 2 HCl + 2 H₂O
+                </div>
+                <div class="subhead">
+                    <strong>Восстановление диоксида теллура</strong> дигидрохлоридом гидразина
+                </div>
+                <div class="product-badges">
+                    <span class="badge reagent">🧪 TeO₂ — порошок</span>
+                    <span class="badge reagent">💧 N₂H₄·2HCl</span>
+                    <span class="badge product">🔘 Te — осадок</span>
+                    <span class="badge water">💨 N₂ + H₂O</span>
+                </div>
+
+                <div class="field-group" style="margin-top:20px;">
+                    <label>Навеска TeO₂ <span class="unit">(г)</span></label>
+                    <input type="number" id="massTeO2_2" step="any" min="0" value="10.0" placeholder="например, 10.0">
+                    <div class="input-hint"><span>молярная масса TeO₂ = 159.60 г/моль</span></div>
+                </div>
+
+                <div class="field-group">
+                    <label>Запас N₂H₄·2HCl <span class="unit">(%)</span></label>
+                    <input type="number" id="excess2" step="any" min="0" value="10.0" placeholder="например, 10">
+                    <div class="input-hint"><span>дополнительный избыток восстановителя</span></div>
+                </div>
+
+                <button class="btn" id="calc2">Рассчитать N₂H₄·2HCl</button>
+                <div class="error-msg" id="error2"></div>
+
+                <div class="result-box" id="result2">
+                    <div class="result-title">📋 Результаты расчета</div>
+                    <div class="result-row">
+                        <span class="result-label">Чистый N₂H₄·2HCl (100%)</span>
+                        <span class="result-value" id="pure2">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">N₂H₄·2HCl с учетом запаса</span>
+                        <span class="result-value" id="excess2out">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row" style="border-top:2px solid #7fd4b8; margin-top:8px; padding-top:14px;">
+                        <span class="result-label" style="font-weight:600; color:#0f6a53;">🔘 Теоретический выход Te</span>
+                        <span class="result-value" id="prod2" style="color:#0f6a53; font-size:1.5rem;">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row" style="padding-top:4px;">
+                        <span class="result-label" style="font-size:0.85rem; color:#4a7a95;">Выход Te (с учетом 100%)</span>
+                        <span class="result-value" id="prod2detail" style="font-size:1rem; color:#4a7a95;">0.00 <small>г</small></span>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+                <div class="section-title">💧 Вода для насыщенного раствора N₂H₄·2HCl</div>
+                
+                <div class="result-box" id="waterResultBox" style="background:#f0faf6; border-color:#b8e6d8; margin-top:0;">
+                    <div class="result-row">
+                        <span class="result-label">Минимум воды (для полного растворения)</span>
+                        <span class="result-value" id="waterMin2" style="color:#0f6a53;">0.00 <small>г (мл)</small></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Масса насыщенного раствора</span>
+                        <span class="result-value" id="satSol2" style="color:#0f6a53;">0.00 <small>г</small></span>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>ℹ️ Справочные данные:</strong><br>
+                    • Молярная масса <strong>N₂H₄·2HCl = 104.97 г/моль</strong><br>
+                    • Молярная масса <strong>Te = 127.60 г/моль</strong><br>
+                    • Растворимость N₂H₄·2HCl: <strong>~2700 г на 1000 г воды</strong> (20 °C).<br>
+                    <strong>Стехиометрия:</strong> 1 моль TeO₂ : 1 моль N₂H₄·2HCl → 1 моль Te.<br>
+                    Указанное количество воды — <strong>минимально необходимое</strong> для получения насыщенного раствора.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= КАЛЬКУЛЯТОР 3: TeO2 + HCl ================= -->
+    <div class="accordion accordion--indigo" id="acc3">
+        <div class="accordion-header" data-target="body3">
+            <h2>
+                <span>🧪 TeO₂ + HCl</span>
+                <span class="reaction-mini">TeO₂ + 6 HCl → H₆TeCl₆</span>
+            </h2>
+            <span class="accordion-icon">▾</span>
+        </div>
+        <div class="accordion-body" id="body3">
+            <div class="card">
+                <h1>⚗️ TeO₂ + HCl</h1>
+                <div class="reaction-badge">
+                    TeO₂ + 6 HCl <span class="arrow">=</span> H₆TeCl₆
+                </div>
+                <div class="subhead">
+                    <strong>Образование гексахлоротеллуровой кислоты</strong>
+                </div>
+                <div class="product-badges">
+                    <span class="badge reagent">🧪 TeO₂ — порошок</span>
+                    <span class="badge reagent">💧 HCl (конц.)</span>
+                    <span class="badge product">🔮 H₆TeCl₆ — комплекс</span>
+                </div>
+
+                <div class="field-group" style="margin-top:20px;">
+                    <label>Навеска TeO₂ <span class="unit">(г)</span></label>
+                    <input type="number" id="massTeO2_3" step="any" min="0" value="10.0" placeholder="например, 10.0">
+                    <div class="input-hint"><span>молярная масса TeO₂ = 159.60 г/моль</span></div>
+                </div>
+
+                <div class="field-group">
+                    <label>Запас HCl <span class="unit">(%)</span></label>
+                    <input type="number" id="excess3" step="any" min="0" value="15.0" placeholder="например, 15">
+                    <div class="input-hint"><span>дополнительный избыток кислоты</span></div>
+                </div>
+
+                <div class="row-2col">
+                    <div class="field-group">
+                        <label>Концентрация HCl <span class="unit">(% масс.)</span></label>
+                        <input type="number" id="conc3" step="any" min="0.1" max="40" value="36.0" placeholder="36">
+                        <div class="input-hint"><span>обычно 36%</span></div>
+                    </div>
+                    <div class="field-group">
+                        <label>Плотность <span class="unit">(г/см³)</span></label>
+                        <input type="number" id="density3" step="any" min="1.0" max="1.3" value="1.18" placeholder="1.18">
+                        <div class="input-hint"><span>ρ ≈ 1.18 для 36%</span></div>
+                    </div>
+                </div>
+
+                <button class="btn" id="calc3">Рассчитать HCl</button>
+                <div class="error-msg" id="error3"></div>
+
+                <div class="result-box" id="result3">
+                    <div class="result-title">📋 Результаты расчета</div>
+                    <div class="result-row">
+                        <span class="result-label">Чистый HCl (100%)</span>
+                        <span class="result-value" id="pure3">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">HCl с учетом запаса</span>
+                        <span class="result-value" id="excess3out">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Масса раствора HCl</span>
+                        <span class="result-value" id="solMass3">0.00 <small>г</small></span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Объем раствора HCl</span>
+                        <span class="result-value" id="solVol3">0.00 <small>мл</small></span>
+                    </div>
+                    <div class="result-row" style="border-top:2px solid #b6c0f5; margin-top:6px; padding-top:12px;">
+                        <span class="result-label">Теоретический выход H₆TeCl₆</span>
+                        <span class="result-value" id="prod3">0.00 <small>г</small></span>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>ℹ️ Примечание:</strong> Реакция комплексообразования. 
+                    Стехиометрия: <strong>1 моль TeO₂ требует 6 моль HCl</strong>. 
+                    Продукт: H₆TeCl₆ — гексахлоротеллуровая кислота (в растворе). 
+                    Запас добавляется к теоретически необходимому количеству чистого HCl.
+                    Выход H₆TeCl₆ рассчитан теоретически (100%).
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= КАЛЬКУЛЯТОР 4: Вода для насыщенного H6TeO6 (20 и 95 °C) ================= -->
+    <div class="accordion accordion--water" id="acc4">
+        <div class="accordion-header" data-target="body4">
+            <h2>
+                <span>💧 Вода для H₆TeO₆</span>
+                <span class="reaction-mini">20 °C и 95 °C</span>
+            </h2>
+            <span class="accordion-icon">▾</span>
+        </div>
+        <div class="accordion-body" id="body4">
+            <div class="card">
+                <h1>💧 Вода для насыщенного H₆TeO₆</h1>
+                <div class="reaction-badge">
+                    H₆TeO₆ + H₂O <span class="arrow">→</span> насыщенный раствор
+                </div>
+                <div class="subhead">
+                    <strong>Расчёт минимального объёма воды</strong> для полного растворения заданной массы ортотеллуровой кислоты при 20 °C и 95 °C
+                </div>
+                <div class="product-badges">
+                    <span class="badge product">🟡 H₆TeO₆ — порошок</span>
+                    <span class="badge water">💧 H₂O — растворитель</span>
+                </div>
+
+                <div class="field-group" style="margin-top:20px;">
+                    <label>Масса H₆TeO₆ <span class="unit">(г)</span></label>
+                    <input type="number" id="massH6TeO6_4" step="any" min="0" value="11.48" placeholder="например, 11.48">
+                    <div class="input-hint"><span>теоретический выход из 5 г Te = 11.48 г</span></div>
+                </div>
+
+                <div class="field-group">
+                    <label>Запас воды <span class="unit">(%)</span></label>
+                    <input type="number" id="excess4" step="any" min="0" value="10.0" placeholder="например, 10">
+                    <div class="input-hint"><span>дополнительный избыток воды сверх минимально необходимого</span></div>
+                </div>
+
+                <button class="btn" id="calc4">Рассчитать воду</button>
+                <div class="error-msg" id="error4"></div>
+
+                <div class="result-box" id="result4">
+                    <div class="result-title">📋 Результаты расчета</div>
+
+                    <!-- Блок 20 °C -->
+                    <div class="temp-block">
+                        <div class="temp-header">
+                            <span class="temp-title">❄️ 20 °C</span>
+                            <span class="temp-solubility">41.6 г / 100 г H₂O</span>
+                        </div>
+                        <div class="temp-row">
+                            <span class="temp-label">Минимум воды (для полного растворения)</span>
+                            <span class="temp-value" id="waterMin20">0.00 <small>г (мл)</small></span>
+                        </div>
+                        <div class="temp-row">
+                            <span class="temp-label">Вода с учётом запаса</span>
+                            <span class="temp-value" id="waterExcess20">0.00 <small>г (мл)</small></span>
+                        </div>
+                        <div class="temp-row">
+                            <span class="temp-label">Масса насыщенного раствора</span>
+                            <span class="temp-value" id="satSol20">0.00 <small>г</small></span>
+                        </div>
+                    </div>
+
+                    <!-- Блок 95 °C -->
+                    <div class="temp-block">
+                        <div class="temp-header">
+                            <span class="temp-title">🔥 95 °C</span>
+                            <span class="temp-solubility">155 г / 100 г H₂O</span>
+                        </div>
+                        <div class="temp-row">
+                            <span class="temp-label">Минимум воды (для полного растворения)</span>
+                            <span class="temp-value" id="waterMin95">0.00 <small>г (мл)</small></span>
+                        </div>
+                        <div class="temp-row">
+                            <span class="temp-label">Вода с учётом запаса</span>
+                            <span class="temp-value" id="waterExcess95">0.00 <small>г (мл)</small></span>
+                        </div>
+                        <div class="temp-row">
+                            <span class="temp-label">Масса насыщенного раствора</span>
+                            <span class="temp-value" id="satSol95">0.00 <small>г</small></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note">
+                    <strong>ℹ️ Справочные данные:</strong><br>
+                    • Растворимость <strong>H₆TeO₆ = 41.6 г на 100 г воды</strong> при 20 °C.<br>
+                    • Растворимость <strong>H₆TeO₆ = 155 г на 100 г воды</strong> при 95 °C (литературные данные; при 100 °C — 155 г/100 г).<br>
+                    • Плотность воды принята <strong>1.00 г/мл</strong> для пересчёта массы в объём.<br>
+                    • <strong>Запас</strong> добавляется к минимально необходимому количеству воды при каждой температуре.<br>
+                    • «Масса насыщенного раствора» рассчитана с учётом запаса воды.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- 1. Аккордеон ----------
+    document.querySelectorAll('.accordion-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const targetId = this.dataset.target;
+            const body = document.getElementById(targetId);
+            if (!body) return;
+
+            const isOpen = body.classList.contains('open');
+            
+            document.querySelectorAll('.accordion-body').forEach(b => b.classList.remove('open'));
+            document.querySelectorAll('.accordion-header').forEach(h => h.classList.remove('active'));
+
+            if (!isOpen) {
+                body.classList.add('open');
+                this.classList.add('active');
+            }
+        });
+    });
+
+    // ---------- 2. Функция форматирования ----------
+    function fmt(value, decimals = 2) {
+        if (!isFinite(value) || value < 0) return '—';
+        return value.toLocaleString('ru-RU', {
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
+        });
+    }
+
+    // ---------- 3. Калькулятор 1: Te + H2O2 ----------
+    (function() {
+        const M_Te = 127.60;
+        const M_H2O2 = 34.01;
+        const M_H6TeO6 = 229.64;
+        const STOICH = 3;
+
+        const massTe = document.getElementById('massTe1');
+        const excess = document.getElementById('excess1');
+        const conc = document.getElementById('conc1');
+        const density = document.getElementById('density1');
+        const btn = document.getElementById('calc1');
+        const err = document.getElementById('error1');
+
+        const pureOut = document.getElementById('pure1');
+        const excessOut = document.getElementById('excess1out');
+        const solMassOut = document.getElementById('solMass1');
+        const solVolOut = document.getElementById('solVol1');
+        const prodOut = document.getElementById('prod1');
+        const resultBox = document.getElementById('result1');
+
+        function clear() {
+            pureOut.innerHTML = `— <small>г</small>`;
+            excessOut.innerHTML = `— <small>г</small>`;
+            solMassOut.innerHTML = `— <small>г</small>`;
+            solVolOut.innerHTML = `— <small>мл</small>`;
+            prodOut.innerHTML = `— <small>г</small>`;
+            resultBox.classList.remove('highlight');
+        }
+
+        function calc() {
+            err.textContent = '';
+            const mTe = parseFloat(massTe.value);
+            const ex = parseFloat(excess.value);
+            const c = parseFloat(conc.value);
+            const d = parseFloat(density.value);
+
+            if (isNaN(mTe) || mTe <= 0) { err.textContent = 'Введите положительную навеску Te.'; clear(); return; }
+            if (isNaN(ex) || ex < 0) { err.textContent = 'Запас не может быть отрицательным.'; clear(); return; }
+            if (isNaN(c) || c <= 0 || c > 100) { err.textContent = 'Концентрация H₂O₂ должна быть 0–100%.'; clear(); return; }
+            if (isNaN(d) || d <= 0.5 || d > 2.0) { err.textContent = 'Плотность должна быть 1.0–1.3 г/мл.'; clear(); return; }
+
+            const molTe = mTe / M_Te;
+            const molH2O2 = molTe * STOICH;
+            const pureMass = molH2O2 * M_H2O2;
+            const excessMass = pureMass * (1 + ex / 100);
+            const solMass = excessMass / (c / 100);
+            const solVol = solMass / d;
+            const prodMass = molTe * M_H6TeO6;
+
+            pureOut.innerHTML = `${fmt(pureMass)} <small>г</small>`;
+            excessOut.innerHTML = `${fmt(excessMass)} <small>г</small>`;
+            solMassOut.innerHTML = `${fmt(solMass)} <small>г</small>`;
+            solVolOut.innerHTML = `${fmt(solVol, 2)} <small>мл</small>`;
+            prodOut.innerHTML = `${fmt(prodMass)} <small>г</small>`;
+            resultBox.classList.add('highlight');
+        }
+
+        btn.addEventListener('click', calc);
+        [massTe, excess, conc, density].forEach(inp => inp.addEventListener('keypress', e => {
+            if (e.key === 'Enter') { e.preventDefault(); calc(); }
+        }));
+        window.addEventListener('load', calc);
+    })();
+
+    // ---------- 4. Калькулятор 2: TeO2 + N2H4*2HCl ----------
+    (function() {
+        const M_TeO2 = 159.60;
+        const M_N2H4Cl2 = 104.97;
+        const M_Te = 127.60;
+        const STOICH = 1;
+        const SOLUBILITY = 2700;
+
+        const massInput = document.getElementById('massTeO2_2');
+        const excessInput = document.getElementById('excess2');
+        const btn = document.getElementById('calc2');
+        const err = document.getElementById('error2');
+
+        const pureOut = document.getElementById('pure2');
+        const excessOut = document.getElementById('excess2out');
+        const prodOut = document.getElementById('prod2');
+        const prodDetailOut = document.getElementById('prod2detail');
+        const waterMinOut = document.getElementById('waterMin2');
+        const satSolOut = document.getElementById('satSol2');
+        const resultBox = document.getElementById('result2');
+
+        function clear() {
+            pureOut.innerHTML = `— <small>г</small>`;
+            excessOut.innerHTML = `— <small>г</small>`;
+            prodOut.innerHTML = `— <small>г</small>`;
+            prodDetailOut.innerHTML = `— <small>г</small>`;
+            waterMinOut.innerHTML = `— <small>г (мл)</small>`;
+            satSolOut.innerHTML = `— <small>г</small>`;
+            resultBox.classList.remove('highlight');
+        }
+
+        function calc() {
+            err.textContent = '';
+            const mTeO2 = parseFloat(massInput.value);
+            const ex = parseFloat(excessInput.value);
+
+            if (isNaN(mTeO2) || mTeO2 <= 0) { err.textContent = 'Введите положительную навеску TeO₂.'; clear(); return; }
+            if (isNaN(ex) || ex < 0) { err.textContent = 'Запас не может быть отрицательным.'; clear(); return; }
+
+            const molTeO2 = mTeO2 / M_TeO2;
+            const molN2H4Cl2 = molTeO2 * STOICH;
+            const pureMass = molN2H4Cl2 * M_N2H4Cl2;
+            const excessMass = pureMass * (1 + ex / 100);
+            const prodMass = molTeO2 * M_Te;
+            const waterMin = excessMass / (SOLUBILITY / 1000);
+            const satSol = excessMass + waterMin;
+
+            pureOut.innerHTML = `${fmt(pureMass)} <small>г</small>`;
+            excessOut.innerHTML = `${fmt(excessMass)} <small>г</small>`;
+            prodOut.innerHTML = `${fmt(prodMass)} <small>г</small>`;
+            prodDetailOut.innerHTML = `${fmt(prodMass)} <small>г</small>`;
+            waterMinOut.innerHTML = `${fmt(waterMin, 1)} <small>г (мл)</small>`;
+            satSolOut.innerHTML = `${fmt(satSol, 1)} <small>г</small>`;
+            resultBox.classList.add('highlight');
+        }
+
+        btn.addEventListener('click', calc);
+        [massInput, excessInput].forEach(inp => inp.addEventListener('keypress', e => {
+            if (e.key === 'Enter') { e.preventDefault(); calc(); }
+        }));
+        window.addEventListener('load', calc);
+    })();
+
+    // ---------- 5. Калькулятор 3: TeO2 + HCl ----------
+    (function() {
+        const M_TeO2 = 159.60;
+        const M_HCl = 36.46;
+        const M_H6TeCl6 = 339.65;
+        const STOICH = 6;
+
+        const massInput = document.getElementById('massTeO2_3');
+        const excessInput = document.getElementById('excess3');
+        const concInput = document.getElementById('conc3');
+        const densityInput = document.getElementById('density3');
+        const btn = document.getElementById('calc3');
+        const err = document.getElementById('error3');
+
+        const pureOut = document.getElementById('pure3');
+        const excessOut = document.getElementById('excess3out');
+        const solMassOut = document.getElementById('solMass3');
+        const solVolOut = document.getElementById('solVol3');
+        const prodOut = document.getElementById('prod3');
+        const resultBox = document.getElementById('result3');
+
+        function clear() {
+            pureOut.innerHTML = `— <small>г</small>`;
+            excessOut.innerHTML = `— <small>г</small>`;
+            solMassOut.innerHTML = `— <small>г</small>`;
+            solVolOut.innerHTML = `— <small>мл</small>`;
+            prodOut.innerHTML = `— <small>г</small>`;
+            resultBox.classList.remove('highlight');
+        }
+
+        function calc() {
+            err.textContent = '';
+            const mTeO2 = parseFloat(massInput.value);
+            const ex = parseFloat(excessInput.value);
+            const c = parseFloat(concInput.value);
+            const d = parseFloat(densityInput.value);
+
+            if (isNaN(mTeO2) || mTeO2 <= 0) { err.textContent = 'Введите положительную навеску TeO₂.'; clear(); return; }
+            if (isNaN(ex) || ex < 0) { err.textContent = 'Запас не может быть отрицательным.'; clear(); return; }
+            if (isNaN(c) || c <= 0 || c > 100) { err.textContent = 'Концентрация HCl должна быть 0–100%.'; clear(); return; }
+            if (isNaN(d) || d <= 0.5 || d > 2.0) { err.textContent = 'Плотность должна быть 1.0–1.3 г/см³.'; clear(); return; }
+
+            const molTeO2 = mTeO2 / M_TeO2;
+            const molHCl = molTeO2 * STOICH;
+            const pureMass = molHCl * M_HCl;
+            const excessMass = pureMass * (1 + ex / 100);
+            const solMass = excessMass / (c / 100);
+            const solVol = solMass / d;
+            const prodMass = molTeO2 * M_H6TeCl6;
+
+            pureOut.innerHTML = `${fmt(pureMass)} <small>г</small>`;
+            excessOut.innerHTML = `${fmt(excessMass)} <small>г</small>`;
+            solMassOut.innerHTML = `${fmt(solMass)} <small>г</small>`;
+            solVolOut.innerHTML = `${fmt(solVol, 1)} <small>мл</small>`;
+            prodOut.innerHTML = `${fmt(prodMass)} <small>г</small>`;
+            resultBox.classList.add('highlight');
+        }
+
+        btn.addEventListener('click', calc);
+        [massInput, excessInput, concInput, densityInput].forEach(inp => inp.addEventListener('keypress', e => {
+            if (e.key === 'Enter') { e.preventDefault(); calc(); }
+        }));
+        window.addEventListener('load', calc);
+    })();
+
+    // ---------- 6. Калькулятор 4: Вода для насыщенного H6TeO6 при 20 и 95 °C ----------
+    (function() {
+        // Растворимость H6TeO6: г на 100 г воды
+        const SOLUBILITY_20 = 41.6;   // 20 °C
+        const SOLUBILITY_95 = 155;    // 95 °C
+
+        const massInput = document.getElementById('massH6TeO6_4');
+        const excessInput = document.getElementById('excess4');
+        const btn = document.getElementById('calc4');
+        const err = document.getElementById('error4');
+
+        const waterMin20Out = document.getElementById('waterMin20');
+        const waterExcess20Out = document.getElementById('waterExcess20');
+        const satSol20Out = document.getElementById('satSol20');
+        const waterMin95Out = document.getElementById('waterMin95');
+        const waterExcess95Out = document.getElementById('waterExcess95');
+        const satSol95Out = document.getElementById('satSol95');
+        const resultBox = document.getElementById('result4');
+
+        function clear() {
+            waterMin20Out.innerHTML = `— <small>г (мл)</small>`;
+            waterExcess20Out.innerHTML = `— <small>г (мл)</small>`;
+            satSol20Out.innerHTML = `— <small>г</small>`;
+            waterMin95Out.innerHTML = `— <small>г (мл)</small>`;
+            waterExcess95Out.innerHTML = `— <small>г (мл)</small>`;
+            satSol95Out.innerHTML = `— <small>г</small>`;
+            resultBox.classList.remove('highlight');
+        }
+
+        function calc() {
+            err.textContent = '';
+            const mass = parseFloat(massInput.value);
+            const ex = parseFloat(excessInput.value);
+
+            if (isNaN(mass) || mass <= 0) {
+                err.textContent = 'Введите положительную массу H₆TeO₆.';
+                clear();
+                return;
+            }
+            if (isNaN(ex) || ex < 0) {
+                err.textContent = 'Запас не может быть отрицательным.';
+                clear();
+                return;
+            }
+
+            const excessFactor = 1 + ex / 100;
+
+            // 20 °C
+            const waterMin20 = (mass / SOLUBILITY_20) * 100;
+            const waterExcess20 = waterMin20 * excessFactor;
+            const satSol20 = mass + waterExcess20;
+
+            // 95 °C
+            const waterMin95 = (mass / SOLUBILITY_95) * 100;
+            const waterExcess95 = waterMin95 * excessFactor;
+            const satSol95 = mass + waterExcess95;
+
+            waterMin20Out.innerHTML = `${fmt(waterMin20, 1)} <small>г (мл)</small>`;
+            waterExcess20Out.innerHTML = `${fmt(waterExcess20, 1)} <small>г (мл)</small>`;
+            satSol20Out.innerHTML = `${fmt(satSol20, 1)} <small>г</small>`;
+            waterMin95Out.innerHTML = `${fmt(waterMin95, 1)} <small>г (мл)</small>`;
+            waterExcess95Out.innerHTML = `${fmt(waterExcess95, 1)} <small>г (мл)</small>`;
+            satSol95Out.innerHTML = `${fmt(satSol95, 1)} <small>г</small>`;
+            resultBox.classList.add('highlight');
+        }
+
+        btn.addEventListener('click', calc);
+        [massInput, excessInput].forEach(inp => inp.addEventListener('keypress', e => {
+            if (e.key === 'Enter') { e.preventDefault(); calc(); }
+        }));
+        window.addEventListener('load', calc);
+    })();
+</script>
+</body>
+</html>
